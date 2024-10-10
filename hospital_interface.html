@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navbar {
+            background-color: black;
+            display: flex;
+            justify-content: space-between;
+            border: 2px solid;
+            position: sticky;
+            width: 100%;
+        }
+
+        .logo {
+            list-style-type: none;
+            padding: 18px;
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .navbar li {
+            float: left;
+            list-style-type: none;
+            padding: 9px 26px;
+            font-size: 18px;
+            display: flex;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            opacity: 0;
+            animation: cardLoad 1s ease-in-out forwards;
+        }
+
+        /* Animation for cards on load */
+        @keyframes cardLoad {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .manage-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .manage-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .inventory-section {
+            grid-column: span 2;
+        }
+
+        .dispense-section {
+            grid-column: span 2;
+        }
+
+        .dispense-section input,
+        .dispense-section select {
+            width: 90%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+        }
+
+        .dispense-section input:focus,
+        .dispense-section select:focus {
+            border-color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="logo">Hospital Management System</div>
+        <nav>
+            <ul>
+                <li><a href="User_interface.html">Patient Dashboard</a></li>
+                <li><a href="#" class="active">Hospital Dashboard</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="container">
+        <!-- Queue Management -->
+        <div class="card">
+            <h3>Queue Management</h3>
+            <p>Outpatient Clinic<br>Current queue: <span id="opd-queue">15</span></p>
+            <button class="manage-btn" onclick="manageQueue('opd-queue')">Manage</button>
+            <p>Emergency Room<br>Current queue: <span id="er-queue">8</span></p>
+            <button class="manage-btn" onclick="manageQueue('er-queue')">Manage</button>
+        </div>
+
+        <!-- Bed Availability -->
+        <div class="card">
+            <h3>Bed Availability</h3>
+            <p>General Ward<br>Available beds: <span id="gen-ward-beds">25</span></p>
+            <button class="manage-btn" onclick="manageBeds('gen-ward-beds')">Manage</button>
+            <p>ICU<br>Available beds: <span id="icu-beds">12</span></p>
+            <button class="manage-btn" onclick="manageBeds('icu-beds')">Manage</button>
+        </div>
+
+        <!-- Patient Admission -->
+        <div class="card">
+            <h3>Patient Admission</h3>
+            <p>New Admissions<br>Pending: <span id="admission-pending">7</span></p>
+            <button class="manage-btn" onclick="manageAdmissions('admission-pending')">Manage</button>
+            <p>Discharges<br>Pending: <span id="discharge-pending">3</span></p>
+            <button class="manage-btn" onclick="manageAdmissions('discharge-pending')">Manage</button>
+        </div>
+
+        <!-- Inventory Management -->
+        <div class="card">
+            <h3>Inventory Management</h3>
+            <p>Medical Supplies<br>Low stock: 8 items</p>
+            <button class="manage-btn">Manage</button>
+        </div>
+
+        <!-- Medication Dispensation -->
+        <div class="card inventory-section">
+            <h3>Medicine Inventory</h3>
+            <p>Total medicines: <span id="total-medicines">1,500</span></p>
+            <p>Medicines dispensed: <span id="medicines-dispensed">1,200</span></p>
+            <p>Remaining medicines: <span id="remaining-medicines">300</span></p>
+        </div>
+
+        <!-- Dispense Medicine -->
+        <div class="card dispense-section">
+            <h3>Dispense Medicine</h3>
+            <form onsubmit="dispenseMedicine(event)">
+                <label for="patient-name">Patient Name</label>
+                <input type="text" id="patient-name" name="patient-name">
+
+                <label for="medicine">Medicine</label>
+                <select id="medicine" name="medicine">
+                    <option value="paracetamol">Paracetamol</option>
+                    <option value="amoxicillin">Amoxicillin</option>
+                    <option value="ibuprofen">Ibuprofen</option>
+                </select>
+
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity">
+
+                <button class="manage-btn" type="submit">Dispense</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Add a small delay to simulate data loading animation
+        function fetchData(section) {
+            setTimeout(() => {
+                fetch(`hospital.php?section=${section}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (section === 'queue') {
+                            document.getElementById('opd-queue').textContent = data[0].current_queue;
+                            document.getElementById('er-queue').textContent = data[1].current_queue;
+                        } else if (section === 'beds') {
+                            document.getElementById('gen-ward-beds').textContent = data[0].available_beds;
+                            document.getElementById('icu-beds').textContent = data[1].available_beds;
+                        } else if (section === 'admissions') {
+                            document.getElementById('admission-pending').textContent = data[0].pending;
+                            document.getElementById('discharge-pending').textContent = data[1].pending;
+                        } else if (section === 'medicines') {
+                            document.getElementById('total-medicines').textContent = data.reduce((total, item) => total + item.total_stock, 0);
+                            document.getElementById('medicines-dispensed').textContent = data.reduce((total, item) => total + item.dispensed_stock, 0);
+                            document.getElementById('remaining-medicines').textContent = data.reduce((total, item) => total + (item.total_stock - item.dispensed_stock), 0);
+                        }
+                    });
+            }, 500);
+        }
+
+        // Call this function when the page loads to populate data
+        window.onload = function () {
+            fetchData('queue');
+            fetchData('beds');
+            fetchData('admissions');
+            fetchData('medicines');
+        };
+
+        // Updating data animations
+        function updateData(section, id, newValue) {
+            fetch('hospital.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `section=${section}&id=${id}&new_value=${newValue}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Update successful!');
+                        fetchData(section);  // Refresh the data on the frontend
+                    }
+                });
+        }
+
+        function manageQueue(queueId) {
+            let queueCount = document.getElementById(queueId).textContent;
+            let newCount = prompt("Enter new queue number:", queueCount);
+            if (newCount !== null && !isNaN(newCount)) {
+                let id = (queueId === 'opd-queue') ? 1 : 2;
+                updateData('queue', id, newCount);
+            }
+        }
+
+        function manageBeds(bedId) {
+            let bedCount = document.getElementById(bedId).textContent;
+            let newCount = prompt("Enter new bed availability:", bedCount);
+            if (newCount !== null && !isNaN(newCount)) {
+                let id = (bedId === 'gen-ward-beds') ? 1 : 2;
+                updateData('beds', id, newCount);
+            }
+        }
+
+        function manageAdmissions(admissionId) {
+            let admissionCount = document.getElementById(admissionId).textContent;
+            let newCount = prompt("Enter new admission count:", admissionCount);
+            if (newCount !== null && !isNaN(newCount)) {
+                let id = (admissionId === 'admission-pending') ? 1 : 2;
+                updateData('admissions', id, newCount);
+            }
+        }
+
+        function dispenseMedicine(event) {
+            event.preventDefault();
+            let quantity = document.getElementById("quantity").value;
+            let remainingMedicines = document.getElementById("remaining-medicines").textContent;
+
+
+
+            if (parseInt(quantity) > parseInt(remainingMedicines)) {
+                alert("Not enough medicine in stock!");
+                return;
+            }
+            alert("Medicine dispensed successfully!");
+        }
+
+
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevents form from refreshing the page
+            const patientName = document.getElementById('patient-name').value;
+            const medicine = document.getElementById('medicine').value;
+            const quantity = document.getElementById('quantity').value;
+
+            if (patientName && medicine && quantity) {
+                alert(`Medicine dispensed!\nPatient: ${patientName}\nMedicine: ${medicine}\nQuantity: ${quantity}`);
+            } else {
+                alert('Please fill in all the fields.');
+            }
+        });
+    </script>
+</body>
+
+</html>
